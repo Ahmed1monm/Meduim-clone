@@ -5,9 +5,11 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { TagEntity } from '../tag/tag.entity';
 import { CommentEntity } from '../comment/comment.entity';
+import { UserEntity } from '../user/user.entity';
 
 @Entity()
 export class ArticleEntity {
@@ -22,6 +24,9 @@ export class ArticleEntity {
 
   @Column({ nullable: true })
   cover_image: string;
+
+  @ManyToOne(() => UserEntity, (user: UserEntity) => user.article)
+  author: UserEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

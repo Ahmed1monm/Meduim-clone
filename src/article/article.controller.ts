@@ -7,11 +7,16 @@ import {
   HttpStatus,
   Body,
   Param,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleEntity } from './article.entity';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateResult } from 'typeorm';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('article')
 export class ArticleController {
@@ -24,34 +29,51 @@ export class ArticleController {
   }
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  async getArticle(@Param('id') id: string): Promise<{ data: ArticleEntity }> {
-    const article: ArticleEntity = await this.articleService.findOneArticle(
+  async getArticle(
+    @Param('id') id: string,
+  ): Promise<{ data: ArticleEntity[] }> {
+    const article: ArticleEntity[] = await this.articleService.findOneArticle(
       parseInt(id, 10),
     );
     return { data: article };
   }
+  @UseGuards(AuthGuard)
   @Post('/')
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createArticleDto: CreateArticleDto,
-  ): Promise<{ data: ArticleEntity }> {
-    const article: ArticleEntity =
+    @Request() req,
+  ): Promise<{ data: ArticleEntity[] }> {
+    const user = req.user;
+    createArticleDto.author = user.id;
+    const article: ArticleEntity[] =
       await this.articleService.createArticle(createArticleDto);
     return { data: article };
   }
+  @UseGuards(AuthGuard)
   @Patch('/:id')
   @HttpCode(HttpStatus.CREATED)
   async update(
     @Body() createArticleDto: CreateArticleDto,
     @Param('id') id: string,
+    @Request() req,
   ): Promise<{ message: string; numberOfAffectedRows: number }> {
-    const article: UpdateResult = await this.articleService.updateArticle(
+    const article: ArticleEntity[] = await this.articleService.findOneArticle(
       parseInt(id),
-      createArticleDto,
     );
+    if (!article[0]) {
+      throw new NotFoundException(`Article with id ${id} does not exist`);
+    }
+    if (article[0].author.id !== req.user.id) {
+      throw new UnauthorizedException(
+        `You are not allowed to update this article ${req.user.id}`,
+      );
+    }
+    const updatedArticle: UpdateResult =
+      await this.articleService.updateArticle(parseInt(id), createArticleDto);
     return {
       message: 'Article updated successfully',
-      numberOfAffectedRows: article.affected,
+      numberOfAffectedRows: updatedArticle.affected,
     };
   }
 }
