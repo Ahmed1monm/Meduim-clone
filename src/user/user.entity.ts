@@ -3,7 +3,6 @@ import {
   Column,
   PrimaryGeneratedColumn,
   JoinColumn,
-  Timestamp,
   OneToMany,
   ManyToOne,
 } from 'typeorm';
@@ -31,9 +30,11 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @OneToMany(() => UserEntity, () => ArticleEntity, { onDelete: 'CASCADE' })
+  @OneToMany(() => ArticleEntity, (article) => article.author, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
-  article: ArticleEntity;
+  article: ArticleEntity[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

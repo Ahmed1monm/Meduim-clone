@@ -14,11 +14,14 @@ export class ArticleService {
   async findAll(): Promise<ArticleEntity[]> {
     return await this.articleRepository.find({ order: { id: 'DESC' } });
   }
-  async findOneArticle(id: number): Promise<ArticleEntity> {
-    return await this.articleRepository.findOneBy({ id });
+  async findOneArticle(id: number): Promise<ArticleEntity[]> {
+    return await this.articleRepository.find({
+      relations: ['author'],
+      where: { id },
+    });
   }
 
-  async createArticle(article: CreateArticleDto): Promise<ArticleEntity> {
+  async createArticle(article): Promise<ArticleEntity[]> {
     return await this.articleRepository.save(article);
   }
   async updateArticle(

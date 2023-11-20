@@ -1,4 +1,4 @@
-import { IsInt, IsString, Length } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateArticleDto {
   @IsString()
@@ -9,6 +9,7 @@ export class CreateArticleDto {
   @Length(10, 2000, { message: 'body is too short' })
   readonly body: string;
 
-  @IsInt()
-  readonly author: number;
+  @IsNumber()
+  @IsOptional()
+  author: number;
 }
