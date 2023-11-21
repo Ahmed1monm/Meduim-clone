@@ -11,6 +11,7 @@ import {
   Request,
   UnauthorizedException,
   NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleEntity } from './article.entity';
@@ -30,11 +31,10 @@ export class ArticleController {
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
   async getArticle(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<{ data: ArticleEntity[] }> {
-    const article: ArticleEntity[] = await this.articleService.findOneArticle(
-      parseInt(id, 10),
-    );
+    const article: ArticleEntity[] =
+      await this.articleService.findOneArticle(id);
     return { data: article };
   }
   @UseGuards(AuthGuard)
@@ -55,12 +55,11 @@ export class ArticleController {
   @HttpCode(HttpStatus.CREATED)
   async update(
     @Body() createArticleDto: CreateArticleDto,
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Request() req,
   ): Promise<{ message: string; numberOfAffectedRows: number }> {
-    const article: ArticleEntity[] = await this.articleService.findOneArticle(
-      parseInt(id),
-    );
+    const article: ArticleEntity[] =
+      await this.articleService.findOneArticle(id);
     if (!article[0]) {
       throw new NotFoundException(`Article with id ${id} does not exist`);
     }
@@ -70,7 +69,7 @@ export class ArticleController {
       );
     }
     const updatedArticle: UpdateResult =
-      await this.articleService.updateArticle(parseInt(id), createArticleDto);
+      await this.articleService.updateArticle(id, createArticleDto);
     return {
       message: 'Article updated successfully',
       numberOfAffectedRows: updatedArticle.affected,
