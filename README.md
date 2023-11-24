@@ -1,5 +1,5 @@
-# Medium-clone:
- a simple medium REST API clone with Nest.js and PostgreSQl to practice Nest.js
+# Xedium:
+ Content management system to write your [blogs | posts | articles]  
 
 ## Database schema: 
 ![Untitled.png](assets/Untitled.png)
