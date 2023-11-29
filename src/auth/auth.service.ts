@@ -16,16 +16,18 @@ export class AuthService {
     const user: UserEntity | null = await this.userService.findOneByUsername(
       data.username,
     );
-    const hashedEnteredPass: Promise<boolean> = bcrypt.compare(
+    const hashedEnteredPass: boolean = await bcrypt.compare(
       data.password,
       user.password,
     );
+    console.log(hashedEnteredPass);
     if (!user || !hashedEnteredPass) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const payload = { id: user.id, username: user.username };
+    const token: string = await this.jwtService.signAsync(payload);
     return {
-      token: await this.jwtService.signAsync(payload),
+      token,
     };
   }
   async register(data: registerDto): Promise<IToken> {
