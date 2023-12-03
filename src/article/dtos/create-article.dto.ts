@@ -12,4 +12,8 @@ export class CreateArticleDto {
   @IsNumber()
   @IsOptional()
   author: number;
+
+  @IsString()
+  @IsOptional()
+  cover_image: string;
 }

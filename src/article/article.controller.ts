@@ -14,6 +14,10 @@ import {
   ParseIntPipe,
   Inject,
   forwardRef,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleEntity } from './article.entity';
@@ -24,6 +28,8 @@ import { CommentEntity } from '../comment/comment.entity';
 import { CommentService } from '../comment/comment.service';
 import { CreateCommentDto } from '../comment/dtos/createComment.dto';
 import { UserService } from '../user/user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AppService } from '../app.service';
 
 @Controller('article')
 export class ArticleController {
@@ -32,6 +38,7 @@ export class ArticleController {
     @Inject(forwardRef(() => CommentService))
     private readonly commentService: CommentService,
     private readonly userService: UserService,
+    private readonly appService: AppService,
   ) {}
   @Get('/')
   @HttpCode(HttpStatus.OK)
@@ -50,13 +57,23 @@ export class ArticleController {
   }
   @UseGuards(AuthGuard)
   @Post('/')
+  @UseInterceptors(FileInterceptor('file'))
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createArticleDto: CreateArticleDto,
-    @Request() req,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/png' })],
+      }),
+    )
+    file: Express.Multer.File,
+    @Request()
+    req: any, // It should be Express.Request, but it wouldn't recognize {user} because it's injected
   ): Promise<{ data: ArticleEntity[] }> {
+    const filename: string = await this.appService.writeFileToDisk(file);
     const user = req.user;
     createArticleDto.author = user.id;
+    createArticleDto.cover_image = filename;
     const article: ArticleEntity[] =
       await this.articleService.createArticle(createArticleDto);
     return { data: article };
@@ -67,7 +84,7 @@ export class ArticleController {
   async update(
     @Body() createArticleDto: CreateArticleDto,
     @Param('id', ParseIntPipe) id: number,
-    @Request() req,
+    @Request() req: any,
   ): Promise<{ message: string; numberOfAffectedRows: number }> {
     const article: ArticleEntity[] =
       await this.articleService.findOneArticle(id);

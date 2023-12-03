@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticleEntity } from './article.entity';
 import { CommentModule } from '../comment/comment.module';
 import { UserModule } from '../user/user.module';
+import { AppModule } from '../app.module';
 
 @Module({
   providers: [ArticleService],
@@ -12,6 +13,7 @@ import { UserModule } from '../user/user.module';
   imports: [
     TypeOrmModule.forFeature([ArticleEntity]),
     forwardRef(() => CommentModule),
+    forwardRef(() => AppModule),
     UserModule,
   ],
   exports: [ArticleService],

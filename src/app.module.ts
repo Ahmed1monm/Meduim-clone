@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -9,18 +9,23 @@ import { config } from '../config';
 import { UsertypeModule } from './usertype/usertype.module';
 import { TagModule } from './tag/tag.module';
 import { AuthModule } from './auth/auth.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
     UserModule,
-    ArticleModule,
+    forwardRef(() => ArticleModule),
     CommentModule,
     TypeOrmModule.forRoot(config),
     UsertypeModule,
     TagModule,
     AuthModule,
+    MulterModule.register({
+      dest: '../assets/',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {}
