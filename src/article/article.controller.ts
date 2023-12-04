@@ -18,6 +18,7 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleEntity } from './article.entity';
@@ -57,15 +58,36 @@ export class ArticleController {
   }
   @UseGuards(AuthGuard)
   @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      fileFilter: (
+        req: Express.Request,
+        file: Express.Multer.File,
+        callback,
+      ) => {
+        const allowedFileTypes = ['.jpg', '.png'];
+        const ext = file.originalname.substring(
+          file.originalname.lastIndexOf('.'),
+        );
+        if (allowedFileTypes.includes(ext.toLowerCase())) {
+          return callback(null, true);
+        } else {
+          return callback(
+            new BadRequestException(
+              `File type ${ext} is not allowed. Allowed types are ${allowedFileTypes.join(
+                ', ',
+              )}`,
+            ),
+            false,
+          );
+        }
+      },
+    }),
+  )
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createArticleDto: CreateArticleDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'image/png' })],
-      }),
-    )
+    @UploadedFile()
     file: Express.Multer.File,
     @Request()
     req: any, // It should be Express.Request, but it wouldn't recognize {user} because it's injected

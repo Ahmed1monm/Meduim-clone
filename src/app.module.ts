@@ -15,6 +15,7 @@ import { MulterModule } from '@nestjs/platform-express';
   imports: [
     UserModule,
     forwardRef(() => ArticleModule),
+    forwardRef(() => AuthModule),
     CommentModule,
     TypeOrmModule.forRoot(config),
     UsertypeModule,

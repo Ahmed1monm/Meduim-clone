@@ -19,7 +19,7 @@ export class registerDto {
 
   @IsString()
   @IsOptional()
-  readonly image: string;
+  image: string;
 
   @IsNumber(
     { maxDecimalPlaces: 1 },
