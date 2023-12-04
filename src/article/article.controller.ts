@@ -15,8 +15,6 @@ import {
   Inject,
   forwardRef,
   UploadedFile,
-  ParseFilePipe,
-  FileTypeValidator,
   UseInterceptors,
   BadRequestException,
 } from '@nestjs/common';
