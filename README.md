@@ -1,6 +1,9 @@
 # Xedium:
  Content management system to write your [blogs | posts | articles]  
 
+## Architecture:
+![architecture](assets/arch.png)
+
 ## Database schema: 
 ![Untitled.png](assets/Untitled.png)
 
