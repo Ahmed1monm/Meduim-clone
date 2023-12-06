@@ -10,20 +10,22 @@ async function bootstrap() {
   await app.listen(process.env.APP_PORT || 3000);
 }
 
-if (cluster.isMaster) {
-  cluster.schedulingPolicy = cluster.SCHED_RR;
-  console.log(`Master ${process.pid} is running`);
-  const cpuCount = cpus().length;
-  for (let i = 0; i < cpuCount; i++) {
-    cluster.fork();
-  }
-  cluster.on('exit', (worker, code: number) => {
-    if (code !== 0 && !worker.exitedAfterDisconnect) {
-      console.log(`Worker ${worker.id} crashed. ` + 'Starting a new worker...');
-      cluster.fork();
-    }
-  });
-} else {
-  console.log(`Worker ${process.pid} started`);
-  bootstrap();
-}
+// if (cluster.isMaster) {
+//   cluster.schedulingPolicy = cluster.SCHED_RR;
+//   console.log(`Master ${process.pid} is running`);
+//   const cpuCount = cpus().length;
+//   for (let i = 0; i < cpuCount; i++) {
+//     cluster.fork();
+//   }
+//   cluster.on('exit', (worker, code: number) => {
+//     if (code !== 0 && !worker.exitedAfterDisconnect) {
+//       console.log(`Worker ${worker.id} crashed. ` + 'Starting a new worker...');
+//       cluster.fork();
+//     }
+//   });
+// } else {
+//   console.log(`Worker ${process.pid} started`);
+//   bootstrap();
+// }
+
+bootstrap();

@@ -21,5 +21,5 @@ export const config = {
     CommentEntity,
     UsertypeEntity,
   ],
-  synchronize: process.env.ENVIROMENT === 'development',
+  synchronize: true, // process.env.ENVIROMENT === 'development',
 };

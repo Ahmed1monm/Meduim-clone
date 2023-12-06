@@ -14,8 +14,9 @@ lerna-debug.log*
 
 # OS
 .DS_Store
-.env
+#.env
 nginx.conf
+Xedium.pem
 
 # Tests
 /coverage
