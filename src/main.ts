@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import cluster from 'cluster';
-import { cpus } from 'os';
+// import cluster from 'cluster';
+// import { cpus } from 'os';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
